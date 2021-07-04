@@ -8,11 +8,7 @@ class GamesProvider {
   Future obtainGames() async {
     final _response = await _http.get(_api);
     List<dynamic> _data = _response.data;
-    List<GamesModel> _games = [];
 
-    for (int i = 0; i < _data.length; i++) {
-      final responseGames = await _http.get(_api);
-      _games.add(GamesModel.fromJson(responseGames.data));
-    }
+    return _data.map((_data) => GamesModel.fromJson(_data)).toList();
   }
 }
