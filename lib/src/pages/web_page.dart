@@ -1,25 +1,22 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get/get_state_manager/src/simple/get_state.dart';
 import 'package:practicaapi/src/models/games_models.dart';
 import 'package:practicaapi/src/providers/games_state.dart';
-import 'package:practicaapi/src/providers/menu_state.dart';
 import 'package:practicaapi/src/style/style.dart' as theme;
 
-class HomePage extends StatefulWidget {
+class WebPages extends StatefulWidget {
   @override
   HomePageState createState() => HomePageState();
 }
 
 class HomePageState extends State {
   final _scrollController = ScrollController();
-  final _menuState = Get.put(MenuState());
   bool _cargando = false;
   @override
   void initState() {
     final games = Get.put(GamesState());
-    games.obtainGames();
+    games.obtainGamesW();
 
     _scrollController.addListener(() async {
       if (_scrollController.position.pixels >=
@@ -29,7 +26,7 @@ class HomePageState extends State {
             _cargando = true;
           });
 
-          games.actu();
+          await games.obtainGamesW();
           setState(() {
             _cargando = false;
           });
@@ -42,8 +39,6 @@ class HomePageState extends State {
 
   @override
   Widget build(BuildContext context) {
-    final games = Get.put(GamesState());
-    games.obtainGames();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: theme.Colors.backgroundColor,
@@ -61,11 +56,11 @@ class HomePageState extends State {
               builder: (GamesState gamesState) {
                 return GridView.builder(
                   controller: _scrollController,
-                  itemCount: games.actu(),
+                  itemCount: gamesState.indexw,
                   gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2, childAspectRatio: 1.16),
+                      crossAxisCount: 2, childAspectRatio: 1.13),
                   itemBuilder: (BuildContext context, int i) {
-                    final _games = gamesState.games[i];
+                    final _games = gamesState.gamesW[i];
                     return GestureDetector(
                       onTap: () => Navigator.pushNamed(context, '/views',
                           arguments: _games),
@@ -73,18 +68,16 @@ class HomePageState extends State {
                         height: 200,
                         child: Card(
                           color: theme.Colors.backgroundColor,
-                          child: Positioned(
-                            child: Container(
-                              child: Column(
-                                children: [
-                                  FadeInImage(
-                                    placeholder: AssetImage('assets/carga.gif'),
-                                    image: NetworkImage(_games.thumbnail!),
-                                  ),
-                                  _TitleGame(_games),
-                                  _DetailsGames(_games),
-                                ],
-                              ),
+                          child: Container(
+                            child: Column(
+                              children: [
+                                FadeInImage(
+                                  placeholder: AssetImage('assets/carga.gif'),
+                                  image: NetworkImage(_games.thumbnail!),
+                                ),
+                                _TitleGame(_games),
+                                _DetailsGames(_games),
+                              ],
                             ),
                           ),
                         ),
@@ -95,39 +88,6 @@ class HomePageState extends State {
               },
             ),
           ],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(20)),
-        child: GetBuilder(
-          builder: (MenuState menuState) {
-            return BottomNavigationBar(
-              backgroundColor: theme.Colors.backgroundColor,
-              selectedItemColor: theme.Colors.mainColor,
-              unselectedItemColor: Colors.grey[600],
-              onTap: (int index) {
-                menuState.index = index;
-
-                if (menuState.index == 1) {
-                  Navigator.pushNamed(context, '/console');
-                } else if (menuState.index == 0) {
-                  Navigator.pushNamed(context, '/');
-                }
-              },
-              currentIndex: menuState.index,
-              items: [
-                BottomNavigationBarItem(
-                  backgroundColor: theme.Colors.grey,
-                  icon: Icon(Icons.person),
-                  label: 'Home',
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.monitor),
-                  label: 'Console',
-                )
-              ],
-            );
-          },
         ),
       ),
     );
@@ -141,10 +101,13 @@ class _TitleGame extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.only(top: 10, left: 10),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
             _games.title!,
+            overflow: TextOverflow.fade,
+            maxLines: 2,
             style: TextStyle(
                 color: theme.Colors.secondaryColor,
                 fontSize: 14,
@@ -165,7 +128,9 @@ class _DetailsGames extends StatelessWidget {
       margin: EdgeInsets.only(top: 10, left: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [Text(_games.platform!, style: TextStyle(color: theme.Colors.grey),)],
+        children: [
+          Text(_games.platform!, style: TextStyle(color: theme.Colors.grey))
+        ],
       ),
     );
   }

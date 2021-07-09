@@ -4,15 +4,20 @@ import 'package:practicaapi/src/providers/games_providers.dart';
 
 class GamesState extends GetxController {
   List<GamesModel> games = [];
+  List<GamesModel> gamesW = [];
   final gamesProvider = GamesProvider();
-  int index = 20;
+  int index = 0;
+  int indexw = 0;
 
   Future<void> obtainGames() async {
     games.addAll(await gamesProvider.obtainGames());
+    index +=20;
     update();
   }
 
-  actu(){
-    return index = index + 20;
+  Future<void> obtainGamesW() async {
+    gamesW.addAll(await gamesProvider.obtainGamesW());
+    indexw +=20;
+    update();
   }
 }

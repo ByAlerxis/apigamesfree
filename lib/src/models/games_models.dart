@@ -6,6 +6,7 @@ class GamesModel {
   String? genre;
   String? platform;
   String? releaseDate;
+  int? id;
 
   GamesModel({
     this.gameUrl,
@@ -15,9 +16,10 @@ class GamesModel {
     this.thumbnail,
     this.title,
     this.releaseDate,
+    this.id,
   });
 
-  factory GamesModel.fromJson(Map<String,dynamic> data){
+  factory GamesModel.fromJson(Map<String, dynamic> data) {
     return GamesModel(
       title: data['title'],
       thumbnail: data['thumbnail'],
@@ -26,6 +28,7 @@ class GamesModel {
       genre: data['genre'],
       platform: data['platform'],
       releaseDate: data['release_date'],
+      id: data['id'],
     );
   }
 }

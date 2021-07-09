@@ -11,4 +11,11 @@ class GamesProvider {
 
     return _data.map((_data) => GamesModel.fromJson(_data)).toList();
   }
+
+  Future obtainGamesW() async {
+    final _responsew = await _http.get('$_api?platform=browser');
+    List<dynamic> _dataw = _responsew.data;
+
+    return _dataw.map((_dataw) => GamesModel.fromJson(_dataw)).toList();
+  }
 }
